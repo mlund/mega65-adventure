@@ -13,17 +13,14 @@
 #[macro_export]
 macro_rules! peek {
     ($address:expr) => {{
-        unsafe {
-            core::ptr::read_volatile($address)
-        }
+        unsafe { core::ptr::read_volatile($address) }
     }};
 }
-
 
 #[macro_export]
 macro_rules! poke {
     ($address:expr, $value:expr) => {{
-        unsafe { 
+        unsafe {
             core::ptr::write_volatile($address, $value);
         }
     }};
@@ -31,9 +28,9 @@ macro_rules! poke {
 
 // see e.g. KickC header files:
 // https://gitlab.com/camelot/kickc/-/tree/master/src/main/kc/include
-pub const BORDER_COLOR:   *mut u8 = (0xd020) as *mut u8; // Border color
-pub const VICII_SCREEN:   *mut u8 = (0x0400) as *mut u8; // Start of screen ram
-pub const VICIII_KEY:     *mut u8 = (0xd02f) as *mut u8;
+pub const BORDER_COLOR: *mut u8 = (0xd020) as *mut u8; // Border color
+pub const VICII_SCREEN: *mut u8 = (0x0400) as *mut u8; // Start of screen ram
+pub const VICIII_KEY: *mut u8 = (0xd02f) as *mut u8;
 pub const VICIV_CONTROLA: *mut u8 = (0xd030) as *mut u8;
 pub const VICIV_CONTROLB: *mut u8 = (0xd031) as *mut u8;
 pub const VICIV_CONTROLC: *mut u8 = (0xd054) as *mut u8;
