@@ -1,9 +1,9 @@
-CLANG=${HOME}/llvm-mos/bin/clang --config ${HOME}/llvm-mos/bin/mos-c64.cfg -O1
+CLANG=${HOME}/llvm-mos/bin/mos-c64-clang
 
 all: main.xex main.s
 
 main.xex: main.ll wrapper.c
-	${CLANG} wrapper.c main.ll -o main.prg
+	${CLANG} wrapper.c main.ll -o main.prg -O2
 
 main.s: main.ll wrapper.c
 	${CLANG} wrapper.c main.ll -o main.s -Wl,--lto-emit-asm
