@@ -18,7 +18,7 @@ xmega65.native -prg main.prg -prgmode 64 # emulate in xemu
 <img src="images/hello_rust.png" width="400">
 
 
-### Things to to:
+### Things to do:
 
 - [x] Added convenience `peek` and `poke` Rust macros
 - [x] Begin mega64 module with hardware registers (see e.g. KickC headers)
