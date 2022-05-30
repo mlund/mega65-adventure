@@ -11,13 +11,17 @@
 #[macro_export]
 macro_rules! peek {
     ($address:expr) => {{
-        unsafe { core::ptr::read_volatile($address) }
+        #[allow(unused_unsafe)]
+        unsafe {
+            core::ptr::read_volatile($address)
+        }
     }};
 }
 
 #[macro_export]
 macro_rules! poke {
     ($address:expr, $value:expr) => {{
+        #[allow(unused_unsafe)]
         unsafe {
             core::ptr::write_volatile($address, $value);
         }

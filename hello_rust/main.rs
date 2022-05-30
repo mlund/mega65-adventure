@@ -10,7 +10,7 @@
 
 #![no_std]
 
-mod mega65;
+pub mod mega65;
 use mega65::*;
 
 /// Greeting text in petscii encoding. @todo translate from ascii
@@ -34,6 +34,7 @@ fn increment_border_color() {
     poke!(BORDER_COLOR, color + 1);
 }
 
+/// Fill entire screen with a single character, assuming 40 x 25 text mode
 fn fill_screen(character: u8) {
     for offset in 0..40 * 25 {
         poke!(VICII_SCREEN.offset(offset as isize), character);
@@ -46,6 +47,11 @@ fn enable_mega65() {
     poke!(VICIII_KEY, 0x53);
     poke!(VICIV_CONTROLB, peek!(VICIV_CONTROLB) | 0x40);
     poke!(VICIV_CONTROLC, peek!(VICIV_CONTROLC) | 0x40);
+
+    // @todo opcode "nop" unrecognized by llvm, see https://llvm-mos.org/wiki/C_Inline_Assembly
+    unsafe {
+        core::arch::asm!(""); // "nop"
+    }
 }
 
 #[no_mangle]
