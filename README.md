@@ -6,12 +6,13 @@ This is a playground for testing programming on the [MEGA65](https://mega65.org)
 
 Amazingly, most core Rust features (`no_std` only) seem to work, including iterators and functional style
 programming.
-The `hello_rust` directory contains a simple example that compiles to a 6502 using
+The `hello_rust` directory contains a simple example that compiles to a 6502 `.prg` using
 [llvm-mos](https://llvm-mos.org) from wrapped Rust code. It requires a working
 Rust installation and the [llvm-mos-sdk](https://github.com/llvm-mos/llvm-mos-sdk#getting-started).
 Compile and run on MEGA65 in c64 mode with:
 
 ~~~ bash
+export CLANG
 cd hello_rust
 make
 xmega65.native -prg main.prg -prgmode 64 # emulate in xemu
@@ -24,10 +25,12 @@ xmega65.native -prg main.prg -prgmode 64 # emulate in xemu
 
 - [x] Added convenience `peek` and `poke`
 - [x] Begin mega66 rust module with hardware registers (see e.g. KickC headers)
-- [ ] Inline assembler?
+- [ ] Inline assembler? `core::arch::asm` seem to work but unknown upcodes
 - [ ] Start in MEGA65 mode
 - [ ] Wrap [mega65-libc](https://github.com/MEGA65/mega65-libc) to Rust?
-- [ ] Use cargo
+- Build
+  - [ ] Use cargo
+  - [ ] Avoid c wrapper
 
 ### Useful links
 

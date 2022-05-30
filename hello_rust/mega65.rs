@@ -8,8 +8,6 @@
 // You should have received a copy of the GNU General Public License along with this program;
 // if not, see http://www.gnu.org/licenses/gpl-3.0
 
-#![no_std]
-
 #[macro_export]
 macro_rules! peek {
     ($address:expr) => {{
