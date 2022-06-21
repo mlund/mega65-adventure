@@ -11,6 +11,7 @@
 #![no_std]
 
 pub mod mega65;
+use core::ptr::write_bytes;
 use mega65::*;
 
 /// Greeting text in petscii encoding. @todo translate from ascii
@@ -18,6 +19,23 @@ const GREETING: [u8; 23] = [
     0x12, 0x15, 0x13, 0x14, 0x20, 0x13, 0x01, 0x19, 0x13, 0x20, 0x08, 0x05, 0x0c, 0x0c, 0x0f, 0x20,
     0xd, 0x5, 0x7, 0x1, 0x36, 0x35, 0x21,
 ];
+
+/// Enable MEGA65 features c.f. deft's raster65 demo#!
+unsafe fn enable_mega65() {
+    poke!(VICIII_KEY, 0x47);
+    poke!(VICIII_KEY, 0x53);
+    poke!(VICIV_CONTROLB, peek!(VICIV_CONTROLB) | 0x40);
+    poke!(VICIV_CONTROLC, peek!(VICIV_CONTROLC) | 0x40);
+
+    // @todo opcode "nop" unrecognized by llvm, see https://llvm-mos.org/wiki/C_Inline_Assembly
+    core::arch::asm!(""); // "nop"
+}
+
+/// Fill entire screen with a single character, assuming 40 x 25 text mode
+/// @todo Use DMA copy instead?
+unsafe fn fill_screen(character: u8) {
+    write_bytes(VICII_SCREEN, character, 40 * 25);
+}
 
 /// Copy a piece of text to screen ram
 fn write_text(xpos: u16, ypos: u16, buffer: &[u8]) {
@@ -34,32 +52,14 @@ fn increment_border_color() {
     poke!(BORDER_COLOR, color + 1);
 }
 
-/// Fill entire screen with a single character, assuming 40 x 25 text mode
-fn fill_screen(character: u8) {
-    for offset in 0..40 * 25 {
-        poke!(VICII_SCREEN.offset(offset as isize), character);
-    }
-}
-
-/// Enable MEGA65 features c.f. deft's raster65 demo
-fn enable_mega65() {
-    poke!(VICIII_KEY, 0x47);
-    poke!(VICIII_KEY, 0x53);
-    poke!(VICIV_CONTROLB, peek!(VICIV_CONTROLB) | 0x40);
-    poke!(VICIV_CONTROLC, peek!(VICIV_CONTROLC) | 0x40);
-
-    // @todo opcode "nop" unrecognized by llvm, see https://llvm-mos.org/wiki/C_Inline_Assembly
-    unsafe {
-        core::arch::asm!(""); // "nop"
-    }
-}
-
 #[no_mangle]
 pub extern "C" fn rusty_main() {
-    enable_mega65();
-    fill_screen(0x20);
-    write_text(8, 12, &GREETING);
-    loop {
-        increment_border_color();
+    unsafe {
+        enable_mega65();
+        fill_screen(0x20);
+        write_text(8, 12, &GREETING);
+        loop {
+            increment_border_color();
+        }
     }
 }

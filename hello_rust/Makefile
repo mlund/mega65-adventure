@@ -1,4 +1,5 @@
 CLANG=${HOME}/llvm-mos/bin/mos-c64-clang
+XEMU=${HOME}/github/xemu/build/bin/xmega65.native
 
 all: main 
 
@@ -12,7 +13,10 @@ main.s: main.ll wrapper.c
 
 # translate rust code
 main.ll: main.rs mega65.rs
-	rustc main.rs --emit=llvm-ir --crate-type=rlib -C debuginfo=0 -C opt-level=1
+	rustc main.rs --emit=llvm-ir --crate-type=rlib -C debuginfo=0 -C opt-level=1 -C target-cpu=mos
+
+run: main
+	${XEMU} -prg main.prg -prgmode 64
 
 clean:
 	rm -fR main.prg main.prg.elf main.ll main.s
