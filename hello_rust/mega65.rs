@@ -31,6 +31,11 @@ macro_rules! poke {
 // see e.g. KickC header files:
 // https://gitlab.com/camelot/kickc/-/tree/master/src/main/kc/include
 pub const BORDER_COLOR: *mut u8 = (0xd020) as *mut u8; // Border color
+pub const SCREEN_COLOR: *mut u8 = (0xd021) as *mut u8; // Border color
+pub const RED_PALETTE: *mut u8 = (0xd100) as *mut u8; // Red component
+pub const GREEN_PALETTE: *mut u8 = (0xd200) as *mut u8; // Green component
+pub const BLUE_PALETTE: *mut u8 = (0xd300) as *mut u8; // Blue component
+pub const COLOUR_RAM: *mut u8 = (0xd800) as *mut u8; // Red background component
 pub const VICII_SCREEN: *mut u8 = (0x0400) as *mut u8; // Start of screen ram
 pub const VICIII_KEY: *mut u8 = (0xd02f) as *mut u8;
 pub const VICIV_CONTROLA: *mut u8 = (0xd030) as *mut u8;
