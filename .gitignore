@@ -13,3 +13,4 @@ Cargo.lock
 *.prg
 *.ll
 *.elf
+*.lst
