@@ -1,10 +1,12 @@
-// Random numbers using the SID chip
+// Randomness from the SID chip:
 // https://www.atarimagazines.com/compute/issue72/random_numbers.php
 
 #include <stdio.h>
+#include <>
 
-#  define POKE(addr,val) (*(volatile unsigned char*)(addr)) = val
-#  define PEEK(addr) (*(volatile unsigned char*)(addr))
+# define POKE(addr,val) (*(volatile unsigned char*)(addr)) = val
+# define PEEK(addr) (*(volatile unsigned char*)(addr))
+# define RAND_MAX 0x7FFF
 
 void start_sid_asm() {
      asm volatile (
@@ -27,7 +29,11 @@ uint8_t random_byte() {
 }
 
 uint16_t random_word() {
-    return 0;
+    uint16_t r;
+    do {
+      r = (uint16_t)( (uint16_t)random_byte() << 8 | (uint16_t)random_byte() );
+    } while (r > RAND_MAX);
+     return 0;
 }
 
 int main() {
