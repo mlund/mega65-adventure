@@ -1,6 +1,6 @@
 /*****************************************************************************\
 ** plasma test program for cc65.                                             **
-** Modified: Run in c64 mode on MEGA65 
+** Modified: Run to c64 mode on MEGA65                                       **
 **                                                                           **
 ** (w)2001 by groepaz                                                        **
 **                                                                           **
@@ -22,6 +22,7 @@
 #define CIA1    (*(volatile struct __6526*)0xDC00)
 #define CIA2    (*(volatile struct __6526*)0xDD00)
 #define rand()  (random16(RAND_MAX))
+#define cputc(letter) __putchar(letter)
 
 #else
 
@@ -170,11 +171,7 @@ void makechar(void)
             ((volatile unsigned char*)CHARSET) [(c*8) + i] = b;
         }
         if ((c & 0x07) == 0) {
-#ifdef __clang__
-            __putchar('.');
-#else
-            cputc ('.');
-#endif
+            cputc('.');
         }
     }
 }
@@ -185,10 +182,9 @@ int main (void)
     int g;
     start_sid_random_generator();
     for (g=0; g<10; g++) {
-        __putchar('.');
-        __putchar(PEEK(0xd41b));
+        cputc('.');
+        cputc(PEEK(0xd41b));
     };
-    return 0;
     makechar();
 
     /* Move the VIC 16K block */

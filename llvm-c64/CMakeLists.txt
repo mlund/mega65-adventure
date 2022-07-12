@@ -7,12 +7,12 @@ find_package(mega65libc REQUIRED)
 find_program(BSA NAMES bsa HINTS ~/bin ~/opt/bin)
 find_program(CA65 NAMES cl65)
 find_program(CC65 NAMES cc65)
-find_program(CL65 NAMES cl65)
+find_program(CL65 NAMES cl65 REQUIRED)
 
 add_compile_options(-mcpu=mos6502 -Os -Wall -Wextra -Wshadow -Wno-language-extension-token)
 
+# plasma.prg
 add_executable(plasma plasma.c)
 target_link_libraries(plasma mega65libc::mega65libc)
 set_target_properties(plasma PROPERTIES OUTPUT_NAME plasma.prg)
-
-
+add_custom_target(plasma_cc65 ALL COMMAND ${CL65} -t c64 -O -o plasma_cc65.prg -m plasma.map plasma.c)
