@@ -13,7 +13,7 @@ add_compile_options(-mcpu=mos6502 -Os -Wall -Wextra -Wshadow -Wno-language-exten
 
 # random-sid.prg
 add_executable(random-sid random-sid.c)
-set_target_properties(random-sid PROPERTIES OUTPUT_NAME random-sid.prg)
+set_target_properties(random-sid PROPERTIES OUTPUT_NAME random-sid_llvm.prg)
 add_custom_target(random-sid_cc65 ALL
     COMMAND ${CL65} -t c64 -O -o random-sid_cc65.prg random-sid.c)
 
