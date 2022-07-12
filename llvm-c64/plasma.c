@@ -24,9 +24,10 @@
 
 #else
 
-#include <cc65.h>
 #include <conio.h>
-
+/* Use static local variables for speed */
+#pragma static-locals (1);
+ 
 #endif
 
 #define POKE(addr, val) (*(volatile uint8_t *)(addr)) = val
@@ -90,7 +91,7 @@ uint16_t rand_word() {
 uint8_t c1A = 0, c1B = 0;
 uint8_t c2A = 0, c2B = 0;
 
-void doplasma(volatile uint8_t *scrn) {
+static void doplasma(register uint8_t *scrn) {
   uint8_t xbuf[40];
   uint8_t ybuf[25];
   uint8_t c1a, c1b;
@@ -127,7 +128,7 @@ void doplasma(volatile uint8_t *scrn) {
 }
 
 void makechar(void) {
-  uint8_t bittab[8] = {0x01, 0x02, 0x04, 0x08,
+  static const uint8_t bittab[8] = {0x01, 0x02, 0x04, 0x08,
                                    0x10, 0x20, 0x40, 0x80};
   uint8_t i, ii, b, s;
   unsigned c;
@@ -160,11 +161,11 @@ int main() {
 
   while (1) {
     /* Build page 1, then make it visible */
-    doplasma((volatile uint8_t *)SCREEN1);
+    doplasma((uint8_t *)SCREEN1);
     POKE(&VIC.addr, PAGE1);
 
     /* Build page 2, then make it visible */
-    doplasma((volatile uint8_t *)SCREEN2);
+    doplasma((uint8_t *)SCREEN2);
     POKE(&VIC.addr, PAGE2);
   }
 
