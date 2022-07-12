@@ -14,6 +14,6 @@ add_compile_options(-mcpu=mos6502 -Os -Wall -Wextra -Wshadow -Wno-language-exten
 
 # plasma.prg
 add_executable(plasma plasma.c)
-target_link_libraries(plasma mega65libc::mega65libc)
+#target_link_libraries(plasma mega65libc::mega65libc)
 set_target_properties(plasma PROPERTIES OUTPUT_NAME plasma_llvm.prg)
 add_custom_target(plasma_cc65 ALL COMMAND ${CL65} -t c64 -O -o plasma_cc65.prg -m plasma.map plasma.c)

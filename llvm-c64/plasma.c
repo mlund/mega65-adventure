@@ -1,18 +1,16 @@
-/*****************************************************************************\
-** plasma test program for cc65.                                             **
-** Modified: Run to c64 mode on MEGA65                                       **
-**                                                                           **
-** (w)2001 by groepaz                                                        **
-**                                                                           **
-** Cleanup and porting by Ullrich von Bassewitz.                             **
-**                                                                           **
-\*****************************************************************************/
+/**
+ * Plasma test sourced from cc65/samples/cbm
+ * - 2001 by groepaz
+ * - Cleanup and porting by Ullrich von Bassewitz.
+ * - Modified to work with cc65 and llvm-mos (wombat)
+ */
 
 #include <stdint.h>
-#include <stdlib.h>
 
+/*********************
+ * LLVM-MOS SPECIFIC *
+ *********************/
 #ifdef __clang__
-
 #include "_6526.h"
 #include "_vic2.h"
 #include <stdio.h>
@@ -22,14 +20,19 @@
 #define CIA2 (*(volatile struct __6526 *)0xdd00)
 #define cputc(letter) __putchar(letter)
 
-#else
-
+/*****************
+ * CC65 SPECIFIC *
+ *****************/
+#elif defined(__CC65__)
+#include <stdlib.h>
 #include <conio.h>
 /* Use static local variables for speed */
 #pragma static-locals (1);
- 
 #endif
 
+/***********
+ * GENERIC *
+ ***********/
 #define POKE(addr, val) (*(volatile uint8_t *)(addr)) = val
 #define PEEK(addr) (*(volatile uint8_t *)(addr))
 #define SCREEN1 0xe000
@@ -88,20 +91,21 @@ uint16_t rand_word() {
   return r;
 }
 
-uint8_t c1A = 0, c1B = 0;
-uint8_t c2A = 0, c2B = 0;
+uint8_t c1A = 0;
+uint8_t c1B = 0;
+uint8_t c2A = 0;
+uint8_t c2B = 0;
 
 static void doplasma(register uint8_t *scrn) {
-  uint8_t xbuf[40];
-  uint8_t ybuf[25];
-  uint8_t c1a, c1b;
-  uint8_t c2a, c2b;
+  static uint8_t xbuf[40];
+  static uint8_t ybuf[25];
   register uint8_t i, ii;
-
-  c1a = c1A;
-  c1b = c1B;
+  uint8_t c2a = c2A;
+  uint8_t c2b = c2B;
+  uint8_t c1a = c1A;
+  uint8_t c1b = c1B;
   for (ii = 0; ii < 25; ++ii) {
-    ybuf[ii] = (sinustable[c1a] + sinustable[c1b]);
+    ybuf[ii] = sinustable[c1a] + sinustable[c1b];
     c1a += 4;
     c1b += 9;
   }
@@ -110,19 +114,16 @@ static void doplasma(register uint8_t *scrn) {
   c2a = c2A;
   c2b = c2B;
   for (i = 0; i < 40; ++i) {
-    xbuf[i] = (sinustable[c2a] + sinustable[c2b]);
+    xbuf[i] = sinustable[c2a] + sinustable[c2b];
     c2a += 3;
     c2b += 7;
   }
   c2A += 2;
   c2B -= 3;
   for (ii = 0; ii < 25; ++ii) {
-    /* Unrolling the following loop will give a speed increase of
-    ** nearly 100% (~24fps), but it will also increase the code
-    ** size a lot.
-    */
+    // can optionally be unrolled with clangs `#pragma unroll`
     for (i = 0; i < 40; ++i, ++scrn) {
-      *scrn = (xbuf[i] + ybuf[ii]);
+      POKE(scrn, xbuf[i] + ybuf[ii]);
     }
   }
 }
@@ -142,7 +143,7 @@ void makechar(void) {
           b |= bittab[ii];
         }
       }
-      ((volatile uint8_t *)CHARSET)[(c * 8) + i] = b;
+      POKE(CHARSET + (c * 8) + i, b);
     }
     if ((c & 0x07) == 0) {
       cputc('.');
@@ -168,6 +169,5 @@ int main() {
     doplasma((uint8_t *)SCREEN2);
     POKE(&VIC.addr, PAGE2);
   }
-
-  return EXIT_SUCCESS;
+  return 0;
 }
