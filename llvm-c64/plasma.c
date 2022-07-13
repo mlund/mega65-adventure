@@ -154,7 +154,6 @@ void makechar(void) {
 int main() {
   start_sid_random_generator();
   makechar();
-
   while (1) {
     /* Build page 1, then make it visible */
     doplasma((uint8_t *)SCREEN1);
