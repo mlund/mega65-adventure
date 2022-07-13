@@ -35,9 +35,9 @@
  ***********/
 #define POKE(addr, val) (*(volatile uint8_t *)(addr)) = val
 #define PEEK(addr) (*(volatile uint8_t *)(addr))
-#define SCREEN1 0xe000
-#define SCREEN2 0xe400
-#define CHARSET 0xe800
+#define SCREEN1 0x2800
+#define SCREEN2 0x2c00
+#define CHARSET 0x2000
 #define VICII_SCREEN 0x0400
 #define VICIII_KEY 0xd02f
 #define VICIV_CONTROLA 0xd030
@@ -152,13 +152,8 @@ void makechar(void) {
 }
 
 int main() {
-  uint8_t block;
   start_sid_random_generator();
   makechar();
-
-  /* Move the VIC 16K block */
-  block = PEEK(&CIA2.pra);
-  POKE(&CIA2.pra, (block & 0xFC) | ((SCREEN1 >> 14) ^ 0x03));
 
   while (1) {
     /* Build page 1, then make it visible */
