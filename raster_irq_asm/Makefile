@@ -1,28 +1,48 @@
 BSA=${HOME}/bin/bsa
-XEMU=${HOME}/github/xemu/build/bin/xmega65.native
+EXOMIZER=${HOME}/bin/exomizer
+XEMU="${HOME}/github/xemu/build/bin/xmega65.native -prgmode 64 -prg "
+VICE=/opt/homebrew/opt/vice/bin/x64sc
 
-all: main hello
+all: main hello flasher1 rasterbars3
 
+# -------------------
+#
 main: main.asm
 	${BSA} main.asm
+	${EXOMIZER} sfx 0x1000 main.o -o main.prg
 
+run: main
+	${VICE} main.prg
+
+# -------------------
+#
 hello: hello_color_irq.asm
 	${BSA} hello_color_irq.asm
+	${EXOMIZER} sfx 0x1000 hello.o -o hello.prg
+
+run_hello: hello
+	${VICE} hello.prg
+
+# -------------------
 
 flasher1: flasher1.asm
 	${BSA} flasher1.asm
+	${EXOMIZER} sfx 0x1000 flasher1.o -o flasher1.prg
 
 run_flasher1: flasher1
-	${XEMU} -prgmode 64 -prg flasher1.prg
+	${VICE} flasher1.prg
 
+# -------------------
+#
+rasterbars3: rasterbars3.asm
+	${BSA} rasterbars3.asm
+	${EXOMIZER} sfx 0x1000 rasterbars3.o -o rasterbars3.prg
 
-run: main
-	${XEMU} -prgmode 64 -prg main.bin
+run_rasterbars3: rasterbars3
+	${VICE} rasterbars3.prg
 
-run_hello: hello
-	${XEMU} -prgmode 64 -prg hello.bin
-
+# -------------------
 
 clean:
-	rm -fR main.prg main.lst *~
+	rm -fR *.prg *.lst *.o *~
 	rm -fR hello_color_irq.lst hello.prg

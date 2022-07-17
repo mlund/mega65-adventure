@@ -38,6 +38,4 @@ Pause:     DEX
            ASL $D019            ; acknowledge the interrupt by clearing the VIC's interrupt flag
 
            JMP $EA31            ; jump into KERNAL's standard interrupt service routine to handle keyboard scan, cursor display etc.
-
-.STORE $1000, $2000, "main.prg"
-
+.STORE $1000, $2000, "main.o"

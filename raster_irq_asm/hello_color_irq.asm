@@ -87,5 +87,5 @@ ack:              ; Expect A to hold desired colour already when hit
 
   jmp $ea31       ; Return to normal IRQ handler
 
-.STORE $c000, $c500, "hello.prg"
+.STORE $c000, $c500, "hello.o"
 

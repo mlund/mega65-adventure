@@ -17,5 +17,5 @@ intcode:
 inc $d020                     ; change border colour
 jmp $ea31
 
-.STORE $1000, $2000, "flasher1.prg"
+.STORE $1000, $2000, "flasher1.o"
 
