@@ -11,7 +11,6 @@
  * LLVM-MOS SPECIFIC *
  *********************/
 #ifdef __clang__
-#include "_6526.h"
 #include "_vic2.h"
 #include <stdio.h>
 #define RAND_MAX 0x7FFF
@@ -24,10 +23,10 @@
  * CC65 SPECIFIC *
  *****************/
 #elif defined(__CC65__)
-#include <stdlib.h>
 #include <conio.h>
+#include <stdlib.h>
 /* Use static local variables for speed */
-#pragma static-locals (1);
+#pragma static - locals(1);
 #endif
 
 /***********
@@ -77,18 +76,18 @@ static const uint8_t sinustable[0x100] = {
  * https://www.atarimagazines.com/compute/issue72/random_numbers.php
  */
 void start_sid_random_generator() {
-  POKE(0xd40e, 0xff);
-  POKE(0xd40f, 0xff);
-  POKE(0xd412, 0x80);
+    POKE(0xd40e, 0xff);
+    POKE(0xd40f, 0xff);
+    POKE(0xd412, 0x80);
 }
 
 /** Two byte pseudo random number generator using SID register */
 uint16_t rand_word() {
-  uint16_t r;
-  do {
-    r = (uint16_t)((uint16_t)PEEK(0xd41b) << 8 | (uint16_t)PEEK(0xd41b));
-  } while (r > RAND_MAX);
-  return r;
+    uint16_t r;
+    do {
+        r = (uint16_t)((uint16_t)PEEK(0xd41b) << 8 | (uint16_t)PEEK(0xd41b));
+    } while (r > RAND_MAX);
+    return r;
 }
 
 uint8_t c1A = 0;
@@ -97,71 +96,71 @@ uint8_t c2A = 0;
 uint8_t c2B = 0;
 
 static void doplasma(register uint8_t *scrn) {
-  static uint8_t xbuf[40];
-  static uint8_t ybuf[25];
-  register uint8_t i, ii;
-  uint8_t c2a = c2A;
-  uint8_t c2b = c2B;
-  uint8_t c1a = c1A;
-  uint8_t c1b = c1B;
-  for (ii = 0; ii < 25; ++ii) {
-    ybuf[ii] = sinustable[c1a] + sinustable[c1b];
-    c1a += 4;
-    c1b += 9;
-  }
-  c1A += 3;
-  c1B -= 5;
-  c2a = c2A;
-  c2b = c2B;
-  for (i = 0; i < 40; ++i) {
-    xbuf[i] = sinustable[c2a] + sinustable[c2b];
-    c2a += 3;
-    c2b += 7;
-  }
-  c2A += 2;
-  c2B -= 3;
-  for (ii = 0; ii < 25; ++ii) {
-    // can optionally be unrolled with clangs `#pragma unroll`
-    for (i = 0; i < 40; ++i, ++scrn) {
-      POKE(scrn, xbuf[i] + ybuf[ii]);
+    static uint8_t xbuf[40];
+    static uint8_t ybuf[25];
+    register uint8_t i, ii;
+    uint8_t c2a = c2A;
+    uint8_t c2b = c2B;
+    uint8_t c1a = c1A;
+    uint8_t c1b = c1B;
+    for (ii = 0; ii < 25; ++ii) {
+        ybuf[ii] = sinustable[c1a] + sinustable[c1b];
+        c1a += 4;
+        c1b += 9;
     }
-  }
+    c1A += 3;
+    c1B -= 5;
+    c2a = c2A;
+    c2b = c2B;
+    for (i = 0; i < 40; ++i) {
+        xbuf[i] = sinustable[c2a] + sinustable[c2b];
+        c2a += 3;
+        c2b += 7;
+    }
+    c2A += 2;
+    c2B -= 3;
+    for (ii = 0; ii < 25; ++ii) {
+        // can optionally be unrolled with clangs `#pragma unroll`
+        for (i = 0; i < 40; ++i, ++scrn) {
+            POKE(scrn, xbuf[i] + ybuf[ii]);
+        }
+    }
 }
 
 void makechar(void) {
-  static const uint8_t bittab[8] = {0x01, 0x02, 0x04, 0x08,
-                                   0x10, 0x20, 0x40, 0x80};
-  uint8_t i, ii, b, s;
-  unsigned c;
+    static const uint8_t bittab[8] = {0x01, 0x02, 0x04, 0x08,
+                                      0x10, 0x20, 0x40, 0x80};
+    uint8_t i, ii, b, s;
+    unsigned c;
 
-  for (c = 0; c < 0x100; ++c) {
-    s = sinustable[c];
-    for (i = 0; i < 8; ++i) {
-      b = 0;
-      for (ii = 0; ii < 8; ++ii) {
-        if ((rand_word() & 0xFFu) > s) {
-          b |= bittab[ii];
+    for (c = 0; c < 0x100; ++c) {
+        s = sinustable[c];
+        for (i = 0; i < 8; ++i) {
+            b = 0;
+            for (ii = 0; ii < 8; ++ii) {
+                if ((rand_word() & 0xFFu) > s) {
+                    b |= bittab[ii];
+                }
+            }
+            POKE(CHARSET + (c * 8) + i, b);
         }
-      }
-      POKE(CHARSET + (c * 8) + i, b);
+        if ((c & 0x07) == 0) {
+            cputc('.');
+        }
     }
-    if ((c & 0x07) == 0) {
-      cputc('.');
-    }
-  }
 }
 
 int main() {
-  start_sid_random_generator();
-  makechar();
-  while (1) {
-    /* Build page 1, then make it visible */
-    doplasma((uint8_t *)SCREEN1);
-    POKE(&VIC.addr, PAGE1);
+    start_sid_random_generator();
+    makechar();
+    while (1) {
+        /* Build page 1, then make it visible */
+        doplasma((uint8_t *)SCREEN1);
+        POKE(&VIC.addr, PAGE1);
 
-    /* Build page 2, then make it visible */
-    doplasma((uint8_t *)SCREEN2);
-    POKE(&VIC.addr, PAGE2);
-  }
-  return 0;
+        /* Build page 2, then make it visible */
+        doplasma((uint8_t *)SCREEN2);
+        POKE(&VIC.addr, PAGE2);
+    }
+    return 0;
 }

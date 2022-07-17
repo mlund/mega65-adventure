@@ -69,7 +69,7 @@ unsafe fn makechar() {
         .for_each(|(cnt, sine)| {
             let mut character = 0b00000000u8;
             BITS.iter()
-                .filter(|_| rand8!() > *sine)
+                .filter(|_| rand8!(c64::SID) > *sine)
                 .for_each(|bit| {
                     character |= bit;
                 });
