@@ -5,7 +5,6 @@
 //
 //   llvm-mos
 //   cc65
-//
 #include <stdint.h>
 #include <stdio.h>
 
@@ -13,13 +12,19 @@
 #define PEEK(addr) (*(volatile unsigned char *)(addr))
 #define RAND_MAX 0x7FFF
 
+void start_sid_asm();
+
+/**
+ * The "globber" string tells the compiler that the assembly code
+ * might modify the accumulator "a"
+ */
 void start_sid_asm() {
 #ifdef __clang__
   asm volatile("lda 0xff\n"
                "sta 0xd40e\n"
                "sta 0xd40f\n"
                "lda 0x80\n"
-               "sta $d412");
+               "sta $d412":::"a");
 #else
   asm("lda #$ff");
   asm("sta $d40e");
@@ -47,14 +52,14 @@ uint16_t rand_word() {
 
 int main() {
   int i;
-  start_sid_asm();
+  start_sid_c();
 
-  printf("RANDOM BYTES:");
+  printf("RANDOM BYTES:\n");
   for (i = 0; i < 20; i++) {
     printf("%d ", rand_byte());
   }
 
-  printf("RANDOM WORDS:");
+  printf("\nRANDOM WORDS:\n");
   for (i = 0; i < 20; i++) {
     printf("%d ", rand_word());
   }
