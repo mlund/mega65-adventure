@@ -3,16 +3,16 @@ EXOMIZER=${HOME}/bin/exomizer
 XEMU="${HOME}/github/xemu/build/bin/xmega65.native -prgmode 64 -prg "
 VICE=/opt/homebrew/opt/vice/bin/x64sc
 
-all: main hello flasher1 rasterbars3
+all: c64wiki hello flasher1 rasterbars3
 
 # -------------------
 #
-main: main.asm
-	${BSA} main.asm
-	${EXOMIZER} sfx 0x1000 main.o -o main.prg
+c64wiki: c64wiki.asm
+	${BSA} c64wiki.asm
+	${EXOMIZER} sfx 0x1000 c64wiki.o -o c64wiki.prg
 
-run: main
-	${VICE} main.prg
+run: c64wiki
+	${VICE} c64wiki.prg
 
 # -------------------
 #

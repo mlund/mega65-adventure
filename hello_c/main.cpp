@@ -7,12 +7,32 @@ using byte = uint8_t;
 typedef void (*IRQ_TYPE)(void);
 IRQ_TYPE* const KERNAL_IRQ = (IRQ_TYPE*)0x0314;
 
+void loop_forever()
+{
+    while (true) {
+        asm volatile("");
+    }
+}
+
 //void irq() asm("IRQ"); // enable asm access
 void irq()
 {
-    auto color = PEEK(0xd020);
-    POKE(0xd020, color + 1);
-    asm volatile("jmp $ea31");
+//    asm volatile(R"(
+//        lda $d019
+//        sta $d019
+//        lda #100
+//        sta $d012
+//        jmp $ea31
+//    )" ::: "a");
+    POKE(0xd019, 0xff);
+    auto raster_line = PEEK(0xd012);
+    if (raster_line > 50) {
+        POKE(0xd020, 2);
+    } else {
+        POKE(0xd020, 3);
+    }
+
+    asm volatile("jmp $ea34");
 }
 
 //void irq2() asm("IRQ2"); // enable asm access
@@ -29,13 +49,6 @@ void irq2()
     )" ::: "a");
 }
 
-
-void loop_forever()
-{
-    while (true) {
-        asm volatile("");
-    }
-}
 
 /*
  * simplest possible interrupt(?)
@@ -54,7 +67,7 @@ void raster_wait_interrupt(IRQ_TYPE irq, const std::uint8_t raster_line)
 {
     asm volatile(R"(
         sei
-        lda #$7f // turn off the cia interrupts
+        lda 0b01111111 // turn off the cia interrupts
         sta $dc0d
         lda $d01a // enable raster irq
         ora #$01
@@ -72,7 +85,7 @@ void raster_wait_interrupt(IRQ_TYPE irq, const std::uint8_t raster_line)
 int main()
 {
     // simple_interrupt(&irq);
-    raster_wait_interrupt(&irq, 60);
+    raster_wait_interrupt(&irq, 50);
     // loop_forever();
 }
 
