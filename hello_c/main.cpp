@@ -44,16 +44,17 @@ void raster_wait_interrupt(IRQ_TYPE irq)
         "sta $d011\n"
         "lda #100\n" // line number to go off at
         "sta $d012\n" // low byte of raster line
-    );
+        ::
+            : "a");
     *KERNAL_IRQ = irq2;
     asm volatile("cli");
 }
 
 int main()
 {
-    //simple_interrupt(&irq);
+    // simple_interrupt(&irq);
     raster_wait_interrupt(&irq);
-    loop_forever();
+    // loop_forever();
 }
 
 void irq()
@@ -65,15 +66,15 @@ void irq()
 
 int mode = 0;
 
-void irq2() {
+void irq2()
+{
     auto color = PEEK(0xd020);
     POKE(0xd020, color + 1);
-    asm volatile(
-            "lda $d019\n"
-            "sta $d019\n"
-            "lda #100\n"
-            "sta $d012\n"
-            "jmp $ea31"
-            );
-
+    asm volatile(R"(
+        lda $d019
+        sta $d019
+        lda #100
+        sta $d012
+        jmp $ea31
+    )" ::: "a");
 }
