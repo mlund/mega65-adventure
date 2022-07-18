@@ -7,8 +7,28 @@ using byte = uint8_t;
 typedef void (*IRQ_TYPE)(void);
 IRQ_TYPE* const KERNAL_IRQ = (IRQ_TYPE*)0x0314;
 
-void irq() asm("IRQ"); // enable asm access
-void irq2() asm("IRQ2"); // enable asm access
+//void irq() asm("IRQ"); // enable asm access
+void irq()
+{
+    auto color = PEEK(0xd020);
+    POKE(0xd020, color + 1);
+    asm volatile("jmp $ea31");
+}
+
+//void irq2() asm("IRQ2"); // enable asm access
+void irq2()
+{
+    auto color = PEEK(0xd020);
+    POKE(0xd020, color + 1);
+    asm volatile(R"(
+        lda $d019
+        sta $d019
+        lda #100
+        sta $d012
+        jmp $ea31
+    )" ::: "a");
+}
+
 
 void loop_forever()
 {
@@ -30,22 +50,21 @@ void simple_interrupt(IRQ_TYPE irq)
 /*
  * interrupt waiting for raster line
  */
-void raster_wait_interrupt(IRQ_TYPE irq)
+void raster_wait_interrupt(IRQ_TYPE irq, const std::uint8_t raster_line)
 {
-    asm volatile(
-        "sei\n"
-        "lda #$7f\n" // turn off the cia interrupts
-        "sta $dc0d\n"
-        "lda $d01a\n" // enable raster irq
-        "ora #$01\n"
-        "sta $d01a\n"
-        "lda $d011\n" // clear high bit of raster line
-        "and #$7f\n"
-        "sta $d011\n"
-        "lda #100\n" // line number to go off at
-        "sta $d012\n" // low byte of raster line
-        ::
-            : "a");
+    asm volatile(R"(
+        sei
+        lda #$7f // turn off the cia interrupts
+        sta $dc0d
+        lda $d01a // enable raster irq
+        ora #$01
+        sta $d01a
+        lda $d011 // clear high bit of raster line
+        and #$7f
+        sta $d011
+        )" :::"a");
+
+    POKE(0xd012, raster_line); // triggering raster line 
     *KERNAL_IRQ = irq2;
     asm volatile("cli");
 }
@@ -53,28 +72,10 @@ void raster_wait_interrupt(IRQ_TYPE irq)
 int main()
 {
     // simple_interrupt(&irq);
-    raster_wait_interrupt(&irq);
+    raster_wait_interrupt(&irq, 60);
     // loop_forever();
-}
-
-void irq()
-{
-    auto color = PEEK(0xd020);
-    POKE(0xd020, color + 1);
-    asm volatile("jmp $ea31");
 }
 
 int mode = 0;
 
-void irq2()
-{
-    auto color = PEEK(0xd020);
-    POKE(0xd020, color + 1);
-    asm volatile(R"(
-        lda $d019
-        sta $d019
-        lda #100
-        sta $d012
-        jmp $ea31
-    )" ::: "a");
-}
+
