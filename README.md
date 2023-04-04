@@ -4,6 +4,8 @@ This is a playground for testing programming on the [MEGA65](https://mega65.org)
 
 ## Rust using llvm-mos
 
+**Update**: _See the [`mos-hardware`](https://github.com/mlund/mos-hardware) crate for using Rust on C64 inspired computers!_
+
 Amazingly, most core Rust features (`no_std` only) seem to work, including iterators and functional style
 programming.
 The `hello_rust` directory contains a simple example that compiles to a C64 `.prg` using
@@ -33,6 +35,7 @@ make run # emulate in xemu
 
 ### Useful links
 
+- https://github.com/mlund/mos-hardware
 - http://forum.6502.org/viewtopic.php?p=84048#p84048
 - https://gergo.erdi.hu/blog/2021-09-18-rust_on_the_mos_6502__beyond_fibonacci/
 - [Atari rust example](https://github.com/mrk-its/llvm-mos-ferris-demo)
